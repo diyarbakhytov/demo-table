@@ -1,0 +1,109 @@
+import { Column, flexRender, type Table as TanstackTable } from "@tanstack/react-table";
+
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+
+import type * as React from "react";
+
+interface DataTableProps<TData> extends React.ComponentProps<"div"> {
+  table: TanstackTable<TData>;
+  actionBar?: React.ReactNode;
+}
+
+export function DataTable<TData>({ table, actionBar, className, ...props }: DataTableProps<TData>) {
+  return (
+    <div className={cn("flex w-full flex-col gap-2.5 overflow-auto", className)} {...props}>
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    colSpan={header.colSpan}
+                    key={header.id}
+                    style={{
+                      ...getCommonPinningStyles({ column: header.column }),
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow data-state={row.getIsSelected() && "selected"} key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      style={{
+                        ...getCommonPinningStyles({ column: cell.column }),
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell className="h-24 text-center" colSpan={table.getAllColumns().length}>
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex flex-col gap-2.5">
+        <DataTablePagination table={table} />
+        {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
+      </div>
+    </div>
+  );
+}
+
+function getCommonPinningStyles<TData>({
+  column,
+  withBorder = false,
+}: {
+  column: Column<TData>;
+  withBorder?: boolean;
+}): React.CSSProperties {
+  const isPinned = column.getIsPinned();
+
+  const isLastLeftPinnedColumn = isPinned === "left" && column.getIsLastColumn("left");
+  const isFirstRightPinnedColumn = isPinned === "right" && column.getIsFirstColumn("right");
+
+  return {
+    boxShadow: withBorder
+      ? isLastLeftPinnedColumn
+        ? "-4px 0 4px -4px var(--border) inset"
+        : isFirstRightPinnedColumn
+          ? "4px 0 4px -4px var(--border) inset"
+          : undefined
+      : undefined,
+    left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
+    right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
+    opacity: isPinned ? 0.9 : 1,
+    position: isPinned ? "sticky" : "relative",
+    background: isPinned ? "var(--card)" : "var(--background)",
+    width: column.getSize(),
+    zIndex: isPinned ? 1 : undefined,
+  };
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@ratio/mock-data",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

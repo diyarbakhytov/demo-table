@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "init": {
+      "command": "echo",
+      "args": [
+        "1"
+      ],
+      "type": "stdio"
+    }
+  }
+}

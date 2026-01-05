@@ -1,0 +1,5 @@
+import { cn } from "@/lib/utils";
+
+export function DataTableToolbar({ className, ...props }: React.ComponentProps<"div">) {
+  return <div className={cn("flex justify-between gap-2", className)} {...props} />;
+}

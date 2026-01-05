@@ -1,5 +1,5 @@
 {
-  "name": "demo-table",
+  "name": "@ratio/demo-table",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -20,5 +20,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@intellectronica/ruler": "^0.3.21"
+  }
 }
