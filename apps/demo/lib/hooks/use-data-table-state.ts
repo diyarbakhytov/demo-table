@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
+import { useMemo, useTransition, useEffect } from "react";
 
 import { useQueryStates } from "nuqs";
 
@@ -18,6 +18,8 @@ import {
   type Filters,
   type Sort,
 } from "@/lib/search-params/posts-search-params";
+
+const STORAGE_KEY = "table_view_state";
 
 export const filterVariantsSchema = [
   "text",
@@ -42,6 +44,23 @@ export function useDataTableState() {
       startTransition,
     }
   );
+
+  useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const parsedState = JSON.parse(savedState);
+        setSearchParams(parsedState);
+      } catch (e) {
+        console.error("Ошибка при чтении localStorage", e);
+      }
+    }
+  }, []);
+  useEffect(() => {
+    if (Object.keys(searchParams).length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(searchParams));
+    }
+  }, [searchParams]);
 
   const paginationState = useMemo<PaginationState>(
     () => ({
